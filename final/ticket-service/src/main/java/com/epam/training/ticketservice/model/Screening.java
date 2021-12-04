@@ -9,17 +9,16 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Component
 @Entity
 @Table(name = "movies")
-@Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
+@Builder
 public class Screening {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -32,4 +31,10 @@ public class Screening {
 
     @Column(name = "date")
     private LocalDateTime startTime;
+
+    @Override
+    public String toString() {
+        return movie.getTitle() + " (" + movie.getGenre() + ", " + movie.getRunningTime() +
+                " minutes), screened in room " + room.getName() + ", at " + startTime;
+    }
 }

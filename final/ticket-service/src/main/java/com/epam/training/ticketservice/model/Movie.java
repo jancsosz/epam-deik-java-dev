@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Component
 @Entity
 @Table(name = "movies")
 @Data
@@ -18,7 +17,7 @@ import javax.persistence.*;
 public class Movie {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "title", unique = true)
@@ -29,6 +28,9 @@ public class Movie {
 
     @Column(name = "runningTime")
     private int runningTime;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Screening> screenings;
 
     @Override
     public String toString() {

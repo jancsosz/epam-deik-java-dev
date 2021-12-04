@@ -6,12 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
-@Component
 @Entity
 @Table(name = "room")
 @Data
@@ -21,12 +18,20 @@ import javax.persistence.Table;
 public class Room {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @Column(name = "rows", nullable = false)
     private int rows;
+
+    @Column(name = "cols", nullable = false)
     private int cols;
+
+    @OneToMany(mappedBy = "room")
+    private List<Screening> screenings;
 
     @Override
     public String toString() {
