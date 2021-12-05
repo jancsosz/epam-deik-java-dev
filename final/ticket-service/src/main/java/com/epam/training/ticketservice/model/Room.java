@@ -4,9 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.OneToMany;
+import javax.persistence.GenerationType;
 import java.util.List;
 
 @Entity
@@ -35,6 +40,7 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room " + this.name + " with " + this.cols * this.rows + " seats, " + this.rows + " rows and " + this.cols + " columns";
+        return "Room " + this.name + " with " + this.cols * this.rows + " seats, "
+                + this.rows + " rows and " + this.cols + " columns";
     }
 }

@@ -4,13 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
-@Table(name = "movies")
+@Table(name = "screenings")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -29,12 +36,13 @@ public class Screening {
     @JoinColumn(name = "room_fk", referencedColumnName = "id")
     private Room room;
 
-    @Column(name = "date")
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
     @Override
     public String toString() {
-        return movie.getTitle() + " (" + movie.getGenre() + ", " + movie.getRunningTime() +
-                " minutes), screened in room " + room.getName() + ", at " + startTime;
+        return movie
+                + ", screened in room " + room.getName() + ", at "
+                + startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 }
