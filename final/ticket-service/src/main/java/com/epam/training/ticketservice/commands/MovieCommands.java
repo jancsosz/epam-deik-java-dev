@@ -1,5 +1,6 @@
 package com.epam.training.ticketservice.commands;
 
+import com.epam.training.ticketservice.exception.CustomException;
 import com.epam.training.ticketservice.model.Movie;
 import com.epam.training.ticketservice.service.MovieService;
 import javassist.NotFoundException;
@@ -10,19 +11,19 @@ import org.springframework.shell.standard.ShellMethodAvailability;
 
 @ShellComponent
 @RequiredArgsConstructor
-public class MovieCommands {
+public class MovieCommands extends CommandAvailability {
 
     private final MovieService movieService;
 
     @ShellMethod(value = "create movie title genre length", key = "create movie")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String createMovie(String title, String genre, int length) {
 
         try {
             Movie movie = movieService.mapToMovie(title, genre, length);
             movieService.createMovie(movie);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             return e.getMessage();
         }
 
@@ -30,7 +31,7 @@ public class MovieCommands {
     }
 
     @ShellMethod(value = "update movie title genre length", key = "update movie")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String updateMovie(String title, String genre, int length) {
 
         try {
@@ -46,7 +47,7 @@ public class MovieCommands {
 
 
     @ShellMethod(value = "delete movie title", key = "delete movie")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String deleteMovie(String title) {
         try {
             movieService.deleteMovie(title);

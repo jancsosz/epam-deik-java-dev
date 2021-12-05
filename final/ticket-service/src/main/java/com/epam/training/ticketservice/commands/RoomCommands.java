@@ -1,5 +1,6 @@
 package com.epam.training.ticketservice.commands;
 
+import com.epam.training.ticketservice.exception.CustomException;
 import com.epam.training.ticketservice.model.Room;
 import com.epam.training.ticketservice.service.RoomService;
 import javassist.NotFoundException;
@@ -10,25 +11,25 @@ import org.springframework.shell.standard.ShellMethodAvailability;
 
 @ShellComponent
 @RequiredArgsConstructor
-public class RoomCommands {
+public class RoomCommands extends CommandAvailability {
 
     private final RoomService roomService;
 
     @ShellMethod(value = "create room name rows columns", key = "create room")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String createRoom(String name, int rows, int columns) {
         try {
             Room room = roomService.mapToRoom(name, rows, columns);
             roomService.createRoom(room);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             return e.getMessage();
         }
         return String.format("Successfully created room '%s'", name);
     }
 
     @ShellMethod(value = "update room roomName rows cols", key = "update room")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String updateRoom(String name, int rows, int columns) {
         try {
             Room room = roomService.mapToRoom(name, rows, columns);
@@ -41,7 +42,7 @@ public class RoomCommands {
     }
 
     @ShellMethod(value = "delete room roomName", key = "delete room")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String deleteRoom(String name) {
         try {
             roomService.deleteRoom(name);

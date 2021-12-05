@@ -1,5 +1,6 @@
 package com.epam.training.ticketservice.commands;
 
+import com.epam.training.ticketservice.exception.CustomException;
 import com.epam.training.ticketservice.model.Screening;
 import com.epam.training.ticketservice.service.MovieService;
 import com.epam.training.ticketservice.service.RoomService;
@@ -12,7 +13,7 @@ import org.springframework.shell.standard.ShellMethodAvailability;
 
 @ShellComponent
 @RequiredArgsConstructor
-public class ScreeningCommands {
+public class ScreeningCommands extends CommandAvailability {
 
     private final ScreeningService screeningService;
 
@@ -21,14 +22,14 @@ public class ScreeningCommands {
     private final RoomService roomService;
 
     @ShellMethod(value = "create screening movieTitle roomName startDate", key = "create screening")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String createScreening(String movieTitle, String roomName, String startDate) throws Exception {
 
         try {
             Screening screening = screeningService.mapToScreening(movieTitle, roomName, startDate);
             screeningService.createScreening(screening);
 
-        } catch (NotFoundException e) {
+        } catch (CustomException e) {
             return e.getMessage();
         }
 
@@ -36,7 +37,7 @@ public class ScreeningCommands {
     }
 
     @ShellMethod(value = "delete screening movieTitle roomName startDate", key = "delete screening")
-    // @ShellMethodAvailability("isAccountAdmin")
+    @ShellMethodAvailability("isAccountAdmin")
     public String deleteScreening(String movieTitle, String roomName, String startDate) {
 
         try {
