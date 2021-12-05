@@ -21,9 +21,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 @Param("rows") Integer numberOfRows);
 
     @Transactional
-    void deleteByNameContainingIgnoreCase(String name);
+    void deleteByName(String name);
 
-    boolean existsByNameContainingIgnoreCase(String name);
+    boolean existsByName(String name);
 
-    Room findByNameContainingIgnoreCase(String name);
+    Room findByName(String name);
 }
