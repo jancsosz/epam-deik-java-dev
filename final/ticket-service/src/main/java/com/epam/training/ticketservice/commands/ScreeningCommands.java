@@ -23,13 +23,13 @@ public class ScreeningCommands extends CommandAvailability {
 
     @ShellMethod(value = "create screening movieTitle roomName startDate", key = "create screening")
     @ShellMethodAvailability("isAccountAdmin")
-    public String createScreening(String movieTitle, String roomName, String startDate) throws Exception {
+    public String createScreening(String movieTitle, String roomName, String startDate) {
 
         try {
             Screening screening = screeningService.mapToScreening(movieTitle, roomName, startDate);
             screeningService.createScreening(screening);
 
-        } catch (CustomException e) {
+        } catch (CustomException | NotFoundException e) {
             return e.getMessage();
         }
 
