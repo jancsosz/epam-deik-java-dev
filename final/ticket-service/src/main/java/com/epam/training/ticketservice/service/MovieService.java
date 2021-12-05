@@ -1,5 +1,6 @@
 package com.epam.training.ticketservice.service;
 
+import com.epam.training.ticketservice.exception.CustomException;
 import com.epam.training.ticketservice.model.Movie;
 import com.epam.training.ticketservice.repository.MovieRepository;
 import javassist.NotFoundException;
@@ -11,9 +12,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MovieService {
-
-    private static final String MOVIE_NOT_FOUND = "Movie with given title not found.";
-    private static final String MOVIE_ALREADY_EXIST = "Movie with given title already exists";
 
     private final MovieRepository movieRepository;
 
@@ -29,7 +27,7 @@ public class MovieService {
         if (movie != null) {
             return movieRepository.findByTitle(title);
         } else {
-            throw new NotFoundException(MOVIE_NOT_FOUND);
+            throw new NotFoundException("Movie with given title not found.");
         }
     }
 
@@ -41,11 +39,11 @@ public class MovieService {
                 .build();
     }
 
-    public void createMovie(Movie movie) throws Exception {
+    public void createMovie(Movie movie) throws CustomException {
         if (!movieRepository.existsByTitle(movie.getTitle())) {
             movieRepository.save(movie);
         } else {
-            throw new Exception(MOVIE_ALREADY_EXIST);
+            throw new CustomException("Movie with given title already exists");
         }
     }
 
@@ -53,7 +51,7 @@ public class MovieService {
         if (movieRepository.existsByTitle(movie.getTitle())) {
             movieRepository.update(movie.getTitle(), movie.getGenre(), movie.getRunningTime());
         } else {
-            throw new NotFoundException(MOVIE_NOT_FOUND);
+            throw new NotFoundException("Movie with given title not found.");
         }
     }
 
@@ -61,7 +59,7 @@ public class MovieService {
         if (movieRepository.existsByTitle(title)) {
             movieRepository.deleteByTitle(title);
         } else {
-            throw new NotFoundException(MOVIE_NOT_FOUND);
+            throw new NotFoundException("Movie with given title not found.");
         }
     }
 
