@@ -6,8 +6,6 @@ import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class CliUserService {
@@ -25,11 +23,4 @@ public class CliUserService {
         }
     }
 
-    public List<CliUser> listAccounts() {
-        return cliUserRepository.findAll();
-    }
-
-    public void createAccount(CliUser cliUser) {
-        cliUserRepository.save(cliUser);
-    }
 }
