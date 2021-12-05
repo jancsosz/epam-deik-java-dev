@@ -1,5 +1,6 @@
 package com.epam.training.ticketservice.service;
 
+import com.epam.training.ticketservice.exception.CustomException;
 import com.epam.training.ticketservice.model.Screening;
 import com.epam.training.ticketservice.repository.ScreeningRepository;
 import javassist.NotFoundException;
@@ -18,37 +19,13 @@ public class ScreeningService {
     private final MovieService movieService;
     private final RoomService roomService;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    private static final String SCREENING_NOT_FOUND = "No screening found with such properties";
-    private static final String BREAK_TIME_CONFLICT =
-            "This would start in the break period after another screening in this room";
-    private static final String OVERLAPPING_TIME = "There is an overlapping screening";
-
     private boolean isDateAvailable(LocalDateTime startDate, LocalDateTime endDate,
                                     LocalDateTime startDateToCheck, LocalDateTime endDateToCheck,
                                     int breakTime) {
 
-        return !((startDateToCheck.isBefore(endDate.plusMinutes(breakTime)) && startDateToCheck.isAfter(startDate))
-                || (endDateToCheck.isBefore(endDate) && endDateToCheck.isAfter(startDate)))
+        return (startDateToCheck.isAfter(endDate.plusMinutes(breakTime)))
+                || (endDateToCheck.plusMinutes(breakTime).isBefore(startDate))
                 && startDate != startDateToCheck && endDate != endDateToCheck;
-    }
-
-    private boolean validateScreening(Screening screening) {
-
-        List<Screening> screeningsInSameRoom = screeningRepository.findByRoom_Name(screening.getRoom().getName());
-
-        if (screeningsInSameRoom.isEmpty()) {
-            return true;
-        } else {
-            return screeningsInSameRoom.stream()
-                    .map(y -> isDateAvailable(y.getStartTime(),
-                            y.getStartTime().plusMinutes(y.getMovie().getRunningTime()),
-                            screening.getStartTime(),
-                            screening.getStartTime().plusMinutes(screening.getMovie().getRunningTime()), 0))
-                    .filter(boolValue -> !boolValue)
-                    .findFirst().orElse(true);
-        }
     }
 
     private boolean validateScreening(Screening screening, int breakTime) {
@@ -59,10 +36,11 @@ public class ScreeningService {
             return true;
         } else {
             return screeningsInSameRoom.stream()
-                    .map(y -> isDateAvailable(y.getStartTime(),
-                            y.getStartTime().plusMinutes(y.getMovie().getRunningTime()),
+                    .map(savedScreening -> isDateAvailable(savedScreening.getStartTime(),
+                            savedScreening.getStartTime().plusMinutes(savedScreening.getMovie().getRunningTime()),
                             screening.getStartTime(),
-                            screening.getStartTime().plusMinutes(screening.getMovie().getRunningTime()), breakTime))
+                            screening.getStartTime().plusMinutes(screening.getMovie().getRunningTime()),
+                            breakTime))
                     .filter(boolValue -> !boolValue)
                     .findFirst().orElse(true);
         }
@@ -71,7 +49,7 @@ public class ScreeningService {
     public Screening mapToScreening(String movieTitle, String roomName, String date)
             throws NotFoundException {
 
-        LocalDateTime parsedDate = LocalDateTime.parse(date, formatter);
+        LocalDateTime parsedDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
         return Screening.builder()
                 .movie(movieService.findByTitle(movieTitle))
@@ -96,21 +74,20 @@ public class ScreeningService {
         if (screening != null) {
             return screening;
         } else {
-            throw new NotFoundException(SCREENING_NOT_FOUND);
+            throw new NotFoundException("No screening found with such properties");
         }
     }
 
 
-    public void createScreening(Screening newScreening) throws Exception {
-        if (validateScreening(newScreening)) {
+    public void createScreening(Screening newScreening) throws CustomException {
+        if (validateScreening(newScreening, 0)) {
             if (validateScreening(newScreening, 10)) {
                 screeningRepository.save(newScreening);
-                System.out.println(screeningRepository.findAll());
             } else {
-                throw new Exception(BREAK_TIME_CONFLICT);
+                throw new CustomException("This would start in the break period after another screening in this room");
             }
         } else {
-            throw new Exception(OVERLAPPING_TIME);
+            throw new CustomException("There is an overlapping screening");
         }
     }
 
@@ -126,7 +103,7 @@ public class ScreeningService {
                     screening.getStartTime());
 
         } else {
-            throw new NotFoundException(SCREENING_NOT_FOUND);
+            throw new NotFoundException("No screening found with such properties");
         }
     }
 
